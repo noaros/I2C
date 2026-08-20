@@ -33,8 +33,8 @@ int _write(int file, char *ptr, int len) {
 }
 
 void main() {
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
-	GPIOB->MODER |= GPIO_MODER_MODER7_0;
+	// RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+	// GPIOB->MODER |= GPIO_MODER_MODER7_0;
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
 	GPIOD->MODER |= GPIO_MODER_MODER8_1;
@@ -46,9 +46,6 @@ void main() {
 again:
 	*(volatile int *)SRAM_BASE += 1;
 	printf("Tick %d\r\n", SysTick->VAL);
-	GPIOB->BSRR = GPIO_BSRR_BS7;
-	while (!(SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)) {}
-	GPIOB->BSRR = GPIO_BSRR_BR7;
 	while (!(SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)) {}
 	goto again;
 }
