@@ -33,8 +33,6 @@ int _write(int file, char *ptr, int len) {
 }
 
 void main() {
-	// RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
-	// GPIOB->MODER |= GPIO_MODER_MODER7_0;
 	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
 	GPIOD->MODER |= GPIO_MODER_MODER8_1;
@@ -43,8 +41,32 @@ void main() {
 	USART3->BRR = 16000000 / 115200;
 	USART3->CR1 |= (USART_CR1_UE | USART_CR1_TE);
 
+	// PB8, PB9 => SCL, SDA
+	#define SCL (8)
+	#define SDA (9)
+
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+	RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
+
+	// GPIOB->MODER != GPIO_MODER_MODER8_1 | GPIO_MODER_MODER9_1;
+	GPIOB->MODER |= (2 << (SCL * 2)) | (2 << (SDA * 2));// set PB8, 9 to AF mode		
+	// GPIOD->AFR[1] |= (4 << GPIO_AFRH_AFSEL8_Pos) | (4 << GPIO_AFRH_AFSEL9_Pos);		
+	GPIOB->AFR[1] |= 4 | (4 << 4);// set to AF4 (I2C1); high reg so we use pins 0 1 not 8 9
+
+	GPIOB->OTYPER |= (1 << SCL) | (1 << SDA);// set output mode to open drain
+	GPIOB->OSPEEDR |= (3 << SCL*2) | (3 << SDA*2);// set very high speed
+
+	// confusing, why do it this way? prob not needed
+	// I2C1->CR1 = I2C_CR1_SWRST;
+	// I2C1->CR1 &= ~I2C_CR1_SWRST;
+
+	I2C1->CR2 |= 0x10;// set periph clock freq to 16 MHz
+	I2C1->CCR = 0x50;// tricky! SCL 100kHz
+	I2C1->TRISE = 0x10;// also tricky, rise time 1000ns
+	I2C1->CR1 |= I2C_CR1_PE;// enable I2C1
+
 again:
-	*(volatile int *)SRAM_BASE += 1;
+	*(volatile int *)SRAM_BASE += 1;//why isn't this causing problems?
 	printf("Tick %d\r\n", SysTick->VAL);
 	while (!(SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)) {}
 	goto again;
