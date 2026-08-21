@@ -13,3 +13,5 @@ Since my board deviates from the one in tutorial, first order of business was ch
 I compared both approaches, but actually like the way the author exposes some of the pin math as registers are set as opposed to full use of CMSIS constants, which seems to hide too much. Therefore I shall adopt similar. I still like CMSIS for the base registers addresses. 
 
 I discovered a fascinating conflict. The author states it is reasonable to assume any board with designated I2C pins would have pullup resistors, needed for I2C to be reliable. Yet Claude says the opposite, that neither his board nor mine actually have those, but that they are commonly provided with the external I2C component board. It is possible he misunderstands why his system is working. I checked my RTC order and it is unclear if it has pullup resistors, though it seems likely. For now I'll just follow along and see.
+
+The author sets high speed mode without saying why.
