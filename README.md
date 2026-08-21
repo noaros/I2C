@@ -10,4 +10,4 @@ I ordered the external real time clock as an excuse for I2C, though I admit it i
 
 Since my board deviates from the one in tutorial, first order of business was checking and deciding on which puns to use for I2C. After consulting multiple AI's, and learning to verify the info in the datasheet / reference manual, and even checking out what pins STM32CubeMX would use, I opted for PB8 and PB9, which differ from the tutorial. The author chose I2C2 for reasons he doesn't say. I'll go with I2C1 since AI suggests that is the default and the pins might be easier to work with.
 
-I compared both approaches, but actually like the way the author exposes some of the pin math as registers are set as opposed to full use of CMSIS constants, which seems to hide too much. Therefore I shall adopt similar.
+I compared both approaches, but actually like the way the author exposes some of the pin math as registers are set as opposed to full use of CMSIS constants, which seems to hide too much. Therefore I shall adopt similar. I still like CMSIS for the registers addresses, 
