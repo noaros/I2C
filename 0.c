@@ -65,9 +65,38 @@ void main() {
 	I2C1->TRISE = 0x10;// also tricky, rise time 1000ns
 	I2C1->CR1 |= I2C_CR1_PE;// enable I2C1
 
+	I2C1->CR1 |= I2C_CR1_START | I2C_CR1_ACK;
+	while (!(I2C1->SR1 & I2C_SR1_SB));// wait on start cond
+
+	I2C1->DR = 0b11010000;//adr + 0-write-bit
+	while (!(I2C1->SR1 & I2C_SR1_ADDR));
+	uint16_t reg = I2C1->SR1 | I2C1->SR2;// clear
+	while (!(I2C1->SR1 & I2C_SR1_TXE));
+	I2C1->DR = 0;// address
+	while (!(I2C1->SR1 & I2C_SR1_BTF));
+
+	reg = I2C1->SR1 | I2C1->SR2;	
+
+	I2C1->CR1 |= I2C_CR1_START;
+	while (!(I2C1->SR1 & I2C_SR1_SB));
+	I2C1->DR = 0b11010001;// read
+	while (!(I2C1->SR1 & I2C_SR1_ADDR));
+	reg = I2C1->SR1 | I2C1->SR2;
+
+	char data[2];
+	*(volatile int *)(SRAM_BASE+4) = 0;
+	for (int i = 0; i < 3; i++)	{
+		*(volatile int *)(SRAM_BASE+4) += 1;
+		if (i + 1 == 3) {
+			I2C1->CR1 &= ~I2C_CR1_ACK;
+			I2C1->CR1 |= I2C_CR1_STOP;
+		}
+		while (!(I2C1->SR1 & I2C_SR1_RXNE));
+		data[i] = I2C1->DR;
+	}
 again:
 	*(volatile int *)SRAM_BASE += 1;//why isn't this causing problems?
-	printf("Tick %d\r\n", SysTick->VAL);
+	printf("Data %d %d\r\n", data[0], data[1]);
 	while (!(SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)) {}
 	goto again;
 }
