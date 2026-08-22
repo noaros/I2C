@@ -52,13 +52,8 @@ void main() {
 	GPIOB->MODER |= (2 << (SCL * 2)) | (2 << (SDA * 2));// set PB8, 9 to AF mode		
 	// GPIOD->AFR[1] |= (4 << GPIO_AFRH_AFSEL8_Pos) | (4 << GPIO_AFRH_AFSEL9_Pos);		
 	GPIOB->AFR[1] |= 4 | (4 << 4);// set to AF4 (I2C1); high reg so we use pins 0 1 not 8 9
-
 	GPIOB->OTYPER |= (1 << SCL) | (1 << SDA);// set output mode to open drain
 	GPIOB->OSPEEDR |= (3 << SCL*2) | (3 << SDA*2);// set very high speed
-
-	// confusing, why do it this way? prob not needed
-	// I2C1->CR1 = I2C_CR1_SWRST;
-	// I2C1->CR1 &= ~I2C_CR1_SWRST;
 
 	I2C1->CR2 |= 0x10;// set periph clock freq to 16 MHz
 	I2C1->CCR = 0x50;// tricky! SCL 100kHz
@@ -67,7 +62,7 @@ void main() {
 
 
 again:
-	*(volatile int *)SRAM_BASE += 1;//why isn't this causing problems?
+	*(volatile int *)0x20000000 += 1;//why isn't this causing problems?
 	I2C1->CR1 |= I2C_CR1_START | I2C_CR1_ACK;
 	while (!(I2C1->SR1 & I2C_SR1_SB));// wait on start cond
 
