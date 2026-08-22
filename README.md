@@ -18,4 +18,4 @@ I think the author makes an error in saying that 'master' sends the 'ack' for th
 
 The author sets high speed mode without saying why. His I2C reset code seems convoluted to me, and since it might not even be needed I'll try leaving it out completely. The author's math derivation for setting SCL frequency was very helpful however vs the obtuse reference manual, and might be the most valuable part of the tutorial for me. I found the DS3231 datasheet and confirmed the max rise time as shown by author. Those setting were also tricky, and I can get why some would want to let the IDE auto generate this. I suspect understanding these concepts could come in handy for debugging however.
 
-One aspect not explained was the I2C address. I assumed mine would be different, but I was able to confirm it was not in the datasheet.
+One aspect not explained was the I2C address. I assumed mine would be different, but I've since learned all such devices are set to the same and further confirmed with the datasheet.
